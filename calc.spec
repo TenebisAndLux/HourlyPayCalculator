@@ -5,7 +5,7 @@ a = Analysis(
     ['calc.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('payment.ico', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
