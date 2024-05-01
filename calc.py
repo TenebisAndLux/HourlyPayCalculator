@@ -11,27 +11,27 @@ def calculate_work_hours(time_str):
         raise ValueError("Неверный формат времени")
 
 
-def load_data_from_file():
+def load_data_from_file(path):
     """Загружает данные из файла 'work_hours.txt' и возвращает список их значений"""
     try:
-        with open('data/work_hours.txt', 'r') as f:
+        with open(path, 'r') as f:
             return [float(line.strip()) for line in f]
     except FileNotFoundError:
         return []
 
 
-def save_data_to_file(data):
+def save_data_to_file(data, path):
     """Сохраняет данные в файл 'work_hours.txt'"""
-    with open('data/work_hours.txt', 'w') as f:
+    with open(path, 'w') as f:
         for value in data:
             f.write(f'{value:.2f}\n')
 
 
-def add_time(data, time_str):
+def add_time(data, time_str, path):
     """Добавляет время в формате "ЧЧ:ММ" в список значений"""
     try:
         data.append(calculate_work_hours(time_str))
-        save_data_to_file(data)
+        save_data_to_file(data, path)
         return "Значение добавлено."
     except ValueError:
         return "Неверный формат времени."
