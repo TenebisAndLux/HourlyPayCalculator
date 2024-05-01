@@ -159,9 +159,8 @@ class Form(QWidget):
     def add_time(self):
         time_str = self.time_input.text()
         try:
-            add_time(self.data, time_str, self.last_path)
+            self.output_field.setPlainText(add_time(self.data, time_str, self.last_path))
             self.update_file_contents()
-            self.output_field.setPlainText("Значение добавлено.")
         except ValueError:
             self.output_field.setPlainText("Неверный формат времени.")
 
