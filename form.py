@@ -1,95 +1,133 @@
 import sys
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QVBoxLayout, QTextEdit, QGridLayout
+from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QTextEdit, QGridLayout, \
+    QApplication, QVBoxLayout, QFrame, QHBoxLayout, QSizePolicy
 from PyQt5.QtCore import Qt
-
 from calc import load_data_from_file, save_data_to_file, add_time, calculate_monthly_hours
 
 
 class Form(QWidget):
     def __init__(self):
         super().__init__()
-        self.setWindowIcon(QIcon('data/gg.png'))
-        self.setWindowTitle('HourlyPayCalculator')
-        resolution = QApplication.primaryScreen().size()
-
-        self.setStyleSheet("""
-            QWidget {
-                background-color: #1A4B32;
-                color: white;
-                font-size: 20px;
-            }
-            QLabel {
-                font-size: 20px;
-            }
-            QLineEdit {
-                background-color: #579D01;
-                color: white;
-                font-size: 20px;
-                border: none;
-                border-radius: 10px;
-                padding: 10px;
-            }
-            QPushButton {
-                background-color: #579D01;
-                color: white;
-                font-size: 20px;
-                border: none;
-                border-radius: 10px;
-                padding: 10px;
-            }
-            QTextEdit {
-                background-color: #579D01;
-                color: white;
-                font-size: 20px;
-                border: none;
-                border-radius: 10px;
-                padding: 10px;
-            }
-        """)
-
-        width, height = resolution.width(), resolution.height()
-        self.setGeometry(int(width / 2.2), int(height / 4), 400, 740)
+        self.initUi()
         self.data = load_data_from_file()
-        self.file_contents = QTextEdit()
+
+    def initUi(self):
+        self.setWindowTitle('HourlyPayCalculator')
+        self.setWindowIcon(QIcon('data/gg.png'))
+        self.setStyleSheet("""
+            QWidget {background-color: #1A4B32; color: white; font-size: 20px;}
+            QLabel {font-size: 20px;}
+            QLineEdit {background-color: #579D01; color: white; font-size: 20px; border: none; border-radius: 10px;
+                       padding: 10px;}
+            QPushButton {background-color: #579D01; color: white; font-size: 20px; border: none; border-radius: 10px;
+                         padding: 10px;}
+            QTextEdit {background-color: #579D01; color: white; font-size: 20px; border: none; border-radius: 10px;
+                       padding: 10px;}
+        """)
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.resize(400, 740)
+
+        self.border_frame = QFrame(self)
+        self.border_frame.setFrameShape(QFrame.StyledPanel)
+        self.border_frame.setFrameShadow(QFrame.Raised)
+        self.border_frame.setStyleSheet("""
+                QFrame {
+                    background-color: #1A4B32;
+                    border: 2px solid #579D01;
+                    border-radius: 10px;
+                    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+                }
+            """)
+        self.border_frame.setContentsMargins(10, 30, 10, 10)
+
+        self.file_contents = QTextEdit(self.border_frame)
         self.file_contents.setReadOnly(True)
         self.update_file_contents()
 
-        self.salary_label = QLabel('Почасовая зарплата:')
-        self.salary_input = QLineEdit()
+        self.salary_label = QLabel('Почасовая зарплата:', self.border_frame)
+        self.salary_input = QLineEdit(self.border_frame)
         self.salary_input.setPlaceholderText("625")
 
-        self.time_label = QLabel('Добавляемое значение:')
-        self.time_input = QLineEdit()
+        self.time_label = QLabel('Добавляемое значение:', self.border_frame)
+        self.time_input = QLineEdit(self.border_frame)
 
-        self.output_field = QTextEdit()
+        self.output_field = QTextEdit(self.border_frame)
         self.output_field.setReadOnly(True)
 
-        self.add_button = QPushButton('Добавить')
+        self.add_button = QPushButton('Добавить', self.border_frame)
         self.add_button.clicked.connect(self.add_time)
 
-        self.delete_button = QPushButton('Удалить')
+        self.delete_button = QPushButton('Удалить', self.border_frame)
         self.delete_button.clicked.connect(self.delete_time)
 
-        self.clear_button = QPushButton('Очистить')
+        self.clear_button = QPushButton('Очистить', self.border_frame)
         self.clear_button.clicked.connect(self.clear_data)
 
-        self.calculate_button = QPushButton('Посчитать')
+        self.calculate_button = QPushButton('Посчитать', self.border_frame)
         self.calculate_button.clicked.connect(self.calculate_data)
 
-        layout = QGridLayout()
+        self.close_button = QPushButton('X', self.border_frame)
+        self.close_button.clicked.connect(self.close)
+        self.close_button.setFixedSize(30, 30)
+        self.close_button.setStyleSheet("border-radius: 15px; background-color: #579D01;")
+
+        self.minimize_button = QPushButton('-', self.border_frame)
+        self.minimize_button.clicked.connect(self.showMinimized)
+        self.minimize_button.setFixedSize(30, 30)
+        self.minimize_button.setStyleSheet("border-radius: 15px; background-color: #579D01;")
+
+        header_layout = QHBoxLayout()
+        header_layout.addStretch()
+
+        button_container = QWidget()
+        button_container.setStyleSheet("""
+            QWidget {
+                border: 2px solid #579D01;
+                border-radius: 15px;
+                background-color: #1A4B32;
+            }
+        """)
+        button_layout = QHBoxLayout(button_container)
+        button_layout.setContentsMargins(500, 3, 9, 3)
+        button_layout.addWidget(self.minimize_button)
+        button_layout.addWidget(self.close_button)
+        button_layout.setAlignment(Qt.AlignCenter)
+        button_layout.setAlignment(Qt.AlignCenter)
+        button_layout.setAlignment(Qt.AlignCenter)
+
+        header_layout.addWidget(button_container)
+
+        layout = QGridLayout(self.border_frame)
         layout.addWidget(self.file_contents, 0, 0, 1, 3)
-        layout.addWidget(self.salary_label, 1, 0)
-        layout.addWidget(self.salary_input, 1, 1)
-        layout.addWidget(self.time_label, 2, 0)
-        layout.addWidget(self.time_input, 2, 1)
-        layout.addWidget(self.add_button, 2, 2)
-        layout.addWidget(self.delete_button, 3, 2)
-        layout.addWidget(self.clear_button, 4, 2)
-        layout.addWidget(self.calculate_button, 5, 2)
+        layout.addWidget(self.salary_label, 1, 0, 1, 1)
+        layout.addWidget(self.salary_input, 1, 1, 1, 1)
+        layout.addWidget(self.time_label, 2, 0, 1, 1)
+        layout.addWidget(self.time_input, 2, 1, 1, 1)
+        layout.addWidget(self.add_button, 2, 2, 1, 1)
+        layout.addWidget(self.delete_button, 3, 2, 1, 1)
+        layout.addWidget(self.clear_button, 4, 2, 1, 1)
+        layout.addWidget(self.calculate_button, 5, 2, 1, 1)
         layout.addWidget(self.output_field, 6, 0, 1, 3)
-        self.setLayout(layout)
+
+        main_layout = QVBoxLayout()
+        main_layout.addLayout(header_layout)
+        main_layout.addWidget(self.border_frame)
+        main_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.setLayout(main_layout)
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.drag_position = event.globalPos() - self.frameGeometry().topLeft()
+            event.accept()
+
+    def mouseMoveEvent(self, event):
+        if event.buttons() == Qt.LeftButton:
+            self.move(event.globalPos() - self.drag_position)
+            event.accept()
 
     def update_file_contents(self):
         data = load_data_from_file()
@@ -135,5 +173,4 @@ if __name__ == '__main__':
     form = Form()
     form.show()
     sys.exit(app.exec_())
-
 
