@@ -40,4 +40,3 @@ stylesheet = """
 
     QTextEdit {background-color: #579D01; color: #F2F2F2; font-size: 24px; border: none; border-radius: 10px;                   padding: 10px;}
 """
-
